@@ -65,7 +65,7 @@ void ListarIntervalo(Filme* BancoDeDados, int quantidade){ //Buscar o arquivo in
     }
 }
 void SalvarArquivo(Filme* BancoDeDados, int quantidade) { // Salva o arquivo do banco de dados em um .txt conforme solicidtado na tarefa
-    ofstream arquivo("C:\\Users\\amara\\Codigos_prog1\\BancoDeDados.txt"); //Cria o fluxo de saída
+    ofstream arquivo("bancodedados.txt"); //Cria o fluxo de saída
 
     if (!arquivo.is_open()) 
     { // Verificar se o arquivo abriu corretamente
@@ -100,8 +100,17 @@ void Inserirfilme (Filme*& BancoDeDados, int& capacidade, int& quantidade) {
     }
 
     cout <<"\n --- Cadastro de Novo Filme ---" << endl;
-
-    BancoDeDados[quantidade].id = quantidade + 1; // Gera o id automaticamente
+    int MaiorId = 0;
+    for (int i = 0; i < quantidade; i++)
+    {
+        if (BancoDeDados[i].id > MaiorId)
+        {
+            MaiorId = BancoDeDados[i].id;
+        }
+        
+    }
+    
+    BancoDeDados[quantidade].id = MaiorId + 1; // Gera o id automaticamente
     cout << "ID Gerado: " << BancoDeDados[quantidade].id << endl;
     cin.ignore();
 
@@ -355,7 +364,7 @@ void RemoverFilme(Filme*& BancoDeDados, int& quantidade) {
     }
 }
 void CarregarArquivo(Filme*& BancoDeDados, int& capacidade, int& quantidade) { // Faz a leitura do arquivo e preenchimento do vetor
-    ifstream arquivo("C:\\Users\\amara\\Codigos_prog1\\BancoDeDados.txt");
+    ifstream arquivo("bancodedados.txt");
 
     if (!arquivo.is_open()) 
     {  // Se o arquivo não existir, não faz nada
@@ -445,6 +454,9 @@ int main() {
             cout << "Opção inválida!" << endl;
             break;
     }
+}
+    delete[] BancoDeDados;
+    return 0;    
 }
     delete[] BancoDeDados;
     return 0;    
