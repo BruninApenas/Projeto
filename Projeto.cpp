@@ -4,7 +4,7 @@
 #include <cstdlib>
 using namespace std;
 
-struct Filme {          // O molde do projeto
+struct Filme {          
     int id;             // Identificador (inteiro)
     string nome;        // Nome (string com espaço)
     string genero;      // Gênero (string com espaço)
@@ -30,8 +30,42 @@ void redimensionar(Filme*& BancoDeDados, int& capacidade, int quantidade) {  // 
     cout <<"Redimensionado para " << NovaCapacidade << endl;
 
 }
+
+void ListarIntervalo(Filme* BancoDeDados, int quantidade){ //Buscar o arquivo inteiro ou o trecho informado pelo usuário
+    cout << "\n---Listar intervalo de filmes---" << endl;
+    cout << "Existem " << quantidade << " filmes cadastrados" << endl;
+
+    int Inicio,Fim;
+    cout << "Digite a posição inicial (ex: 1): ";
+    cin >> Inicio;
+    cout << "Digite a posição final (ex: 10): ";
+    cin >> Fim;
+    
+    if (Inicio < 1 and Fim > quantidade and Inicio > Fim)
+    {
+        cout << "Intervalo inválido! tente novamente";
+        return;
+    }
+
+    cout << "\n--- Filmes do " << Inicio << " ao " << Fim << " ---" << endl;
+
+    for (int i = (Inicio - 1); i < Fim; i++)
+    {
+        if (BancoDeDados[i].id > 0)
+        {
+            cout << "Posição " << (i +1) << "-->"
+                 << "ID: " << BancoDeDados[i].id
+                 << "| Nome: " << BancoDeDados[i].nome
+                 << "| Ano: " << BancoDeDados[i].ano << endl;
+        }
+        else
+        {
+            cout << "Posição " << (i + 1) << " --> [Registro excluído]" << endl;
+        }  
+    }
+}
 void SalvarArquivo(Filme* BancoDeDados, int quantidade) { // Salva o arquivo do banco de dados em um .txt conforme solicidtado na tarefa
-    ofstream arquivo("C:\\Users\\amara\\C++\\bancodedados.txt"); //Cria o fluxo de saída
+    ofstream arquivo("C:\\Users\\amara\\Codigos_prog1\\BancoDeDados.txt"); //Cria o fluxo de saída
 
     if (!arquivo.is_open()) 
     { // Verificar se o arquivo abriu corretamente
@@ -52,7 +86,7 @@ void SalvarArquivo(Filme* BancoDeDados, int quantidade) { // Salva o arquivo do 
     }
 
     arquivo.close();
-    cout << "Dados salvos corretamentes no arquivo bancodedados.txt" << endl;
+    cout << "Dados salvos corretamentes no arquivo BancoDeDados.txt" << endl;
 } 
 
 void Inserirfilme (Filme*& BancoDeDados, int& capacidade, int& quantidade) {
@@ -69,6 +103,7 @@ void Inserirfilme (Filme*& BancoDeDados, int& capacidade, int& quantidade) {
 
     BancoDeDados[quantidade].id = quantidade + 1; // Gera o id automaticamente
     cout << "ID Gerado: " << BancoDeDados[quantidade].id << endl;
+    cin.ignore();
 
     cout << "Nome do filme: ";
     getline(cin, BancoDeDados[quantidade].nome);
@@ -89,99 +124,238 @@ void Inserirfilme (Filme*& BancoDeDados, int& capacidade, int& quantidade) {
     cout << "Filme cadastrado!" << endl;
 }
 
-void RemoverFilme(Filme*& BancoDeDados, int& quantidade) {
-
-    cout << "\n--- Remover Filme ---" << endl;
-    cout << "1. Buscar por ID" << endl;
-    cout << "2. Buscar por Nome" << endl;
-    cout << "3. Buscar por gênero" << endl;
-    cout << "4. Buscar por ano de lançamento" << endl;
-    cout << "Escolha: ";
+void BuscarFilme(Filme* BancoDeDados, int quantidade) { 
     int Opção;
+    cout << "\n--- Busca de Filmes ---" << endl;
+    cout << "1. Buscar por ID" << endl;
+    cout << "2. Buscar por nome" << endl;
+    cout << "3. Buscar por genero" << endl;
+    cout << "4. Buscar por ano de lançamento" << endl;
+    cout << "Escolha --> ";
     cin >> Opção;
 
-    bool encontrou = true;
 
-    if (Opção == 1)
+    bool Achou = false;
+
+    if (Opção == 1) 
     {
         int IdProcurado;
-        cout << "Digite o ID do Filme: "
+        cout << "Digite o ID do Filme: ";
         cin >> IdProcurado;
 
-        for (int i = 0; i < quantidade; i++) 
+        for (int i = 0; i < quantidade && !Achou; i++) 
         {
-            if (BancoDeDados[i].id == IdProcurado and BancoDeDados[i].id > 0) // Verifica se achou e se não está deletado
+            if (BancoDeDados[i].id == IdProcurado && BancoDeDados[i].id > 0) 
             {
-                BancoDeDados[i].id = -1;
-                cout << "Filme removido!";
-                return;
-            }     
+                cout << "\nEncontrado: " << BancoDeDados[i].nome
+                     << " (" << BancoDeDados[i].ano << ")"
+                     << "\nSinopse: " << BancoDeDados[i].sinopse << endl;
+                Achou = true; 
+            }    
         }
-        cout << "Id não encontrado." << endl;
     }
 
-    else if (Opção == 2);
+   
+    else if (Opção == 2)
     {
         string NomeProcurado;
-        cout << "Digite o nome exato: ":
+        cout << "Digite o nome exato: ";
+        cin.ignore();
         getline(cin, NomeProcurado);
 
         for (int i = 0; i < quantidade; i++)
         {
+            if (BancoDeDados[i].nome == NomeProcurado && BancoDeDados[i].id > 0)
+            {
+                cout << "\nEncontrado: " << BancoDeDados[i].nome
+                     << " (" << BancoDeDados[i].ano << ")"
+                     << "\nSinopse: " << BancoDeDados[i].sinopse << endl;
+                Achou = true;
+            }
+        } 
+    }
+
+    else if (Opção == 3 || Opção == 4) 
+    {
+        string BuscarGênero;
+        int BuscarAno = 0;
+        bool EntradaVálida = true;
+
+        if (Opção == 3) {
+            cout << "Digite o genero: ";
+            cin.ignore();
+            getline(cin, BuscarGênero);
+        } else if (Opção == 4) {
+            cout << "Digite o ano de lancamento: ";
+            cin >> BuscarAno;
+        } else {
+            cout << "Opcao invalida, tente novamente";
+            EntradaVálida = false;
+        }
+    
+        if (EntradaVálida) {
+            cout << "\n--- Resultados da busca ---" << endl;
+
+            if (Opção == 3) cout << "Genero: " << BuscarGênero << endl;
+            if (Opção == 4) cout << "Ano: " << BuscarAno << endl;
+            cout << "---------------------------" << endl;
+
+            for (int i = 0; i < quantidade; i++)
+            {
+                if (BancoDeDados[i].id > 0) 
+                {
+                    
+                    bool match = false;
+                    
+                    if (Opção == 3 && BancoDeDados[i].genero == BuscarGênero) match = true;
+                    if (Opção == 4 && BancoDeDados[i].ano == BuscarAno) match = true;
+
+                    if (match)
+                    {
+                        cout << "ID: " << BancoDeDados[i].id << " - " << BancoDeDados[i].nome << endl;
+                        Achou = true; 
+                    }
+                }
+            }     
+        }   
+    }
+    
+    if (!Achou) 
+    {
+        cout << "Nenhum registro encontrado." << endl;
+    }
+}
+void RemoverFilme(Filme*& BancoDeDados, int& quantidade) {
+
+    cout << "\n--- Remover Filme ---" << endl;
+    cout << "1. Buscar por ID" << endl;
+    cout << "2. Buscar por nome" << endl;
+    cout << "3. Buscar por gênero" << endl;
+    cout << "4. Buscar por ano de lançamento" << endl;
+    cout << "Escolha --> ";
+    int Opção;
+    cin >> Opção;
+
+    bool Removido = false;
+
+    if (Opção == 1) 
+    {
+        int IdProcurado;
+        cout << "Digite o ID do Filme: ";
+        cin >> IdProcurado;
+
+        for (int i = 0; i < quantidade and !Removido; i++) 
+        {
+            if (BancoDeDados[i].id == IdProcurado and BancoDeDados[i].id > 0) // Verifica se Achou e se não está deletado
+            {
+                BancoDeDados[i].id = -1;
+                cout << "Filme " << BancoDeDados[i].nome << " removido!";
+                Removido = true;
+            }     
+        }
+        if (!Removido)
+        {
+        cout << "Id não encontrado." << endl;
+        }
+    }
+
+    else if (Opção == 2)
+    {
+        string NomeProcurado;
+        cout << "Digite o nome exato: ";
+
+        cin.ignore();
+        getline(cin, NomeProcurado);
+
+        for (int i = 0; i < quantidade and !Removido; i++)
+        {
             if (BancoDeDados[i].nome == NomeProcurado and BancoDeDados[i].id > 0)
             {
                 BancoDeDados[i].id = -1;
-                cout << "Filme" << NomeProcurado << "removido!" << endl;
-                return;
+                cout << "Filme --" << NomeProcurado << "-- removido!" << endl;
+                Removido = true;
             }
         }
-        cout << "Nome não encontrado." << endl;    
+        if (!Removido)
+        {
+        cout << "Nome não encontrado." << endl;
+        }    
     }
 
     else if (Opção == 3 or Opção == 4)
     {
-        string BuscarGenero;
+        string BuscarGênero;
         int BuscarAno = 0;
-    }
-    
+        bool EntradaVálida = true;
 
-    
-    
-    for (int i = 0; i < quantidade; i++)
-    {
-        if (BancoDeDados[i].nome == NomeProcurado)
+        if (Opção == 3)
         {
-            encontrou = false;
-            cout << "Filme " << NomeProcurado << "encontrado!" << endl;
-
-            for (int j = i; j < quantidade - 1; j++)
-            {
-                BancoDeDados[j] = BancoDeDados [j + 1];
-            }
-
-            quantidade --;
-
-            cout << "Filme removido com sucesso!" << endl; 
+            cout << "Digite o gênero: ";
+            cin.ignore();
+            getline(cin, BuscarGênero);
         }
-
-        else if (BancoDeDados[i].id = IdProcurado)
+        else if (Opção == 4)
         {
-           
+            cout << "Digite o ano de lançamento: ";
+            cin >> BuscarAno;
         }
-        
-
         else
         {
-            cout << "Erro : Filme não encontrado com esse nome exato" << endl;
+            cout << "Opção inválida, tente novamente";
+            EntradaVálida = false;
         }
-        
-        
+    
+        if (EntradaVálida){
+            cout<< "\n--- Filmes Encontrados ---" << endl;
 
+            bool EncontrouAlgum = false;
+
+            for (int i = 0; i < quantidade; i++)
+            {
+                if (BancoDeDados[i].id < 0) {}
+
+                else
+                {
+                    bool Achou = false;
+                    if (Opção == 3 and BancoDeDados[i].genero == BuscarGênero) Achou = true;
+                    if (Opção == 4 and BancoDeDados[i].ano == BuscarAno) Achou = true;
+
+                    if (Achou)
+                    {
+                    cout << "ID: " << BancoDeDados[i].id << "-" << BancoDeDados[i].nome << endl;
+                    EncontrouAlgum = true;
+                    }
+                }
+            }   
         
+            if (EncontrouAlgum) 
+            {
+                int IdParaRemover;
+                cout << "\nDigite o ID do filme acima que deseja remover: ";
+                cin >> IdParaRemover;
+
+                for (int i = 0; i < quantidade and !Removido; i++)
+                {
+                    if (BancoDeDados[i].id == IdParaRemover and BancoDeDados[i].id > 0)
+                    {
+                        BancoDeDados[i].id = -1;
+                        cout << "Filme removido!!" << endl;
+                        Removido = true;
+                    }    
+                }
+                if (!Removido) {
+                    cout << "ID inválido ou não encontrado na lista" << endl;   
+                }   
+            }
+            else
+            {
+            cout << "Nenhum filme encontrado com esses dados." << endl;
+            }        
+        }   
     }
 }
 void CarregarArquivo(Filme*& BancoDeDados, int& capacidade, int& quantidade) { // Faz a leitura do arquivo e preenchimento do vetor
-    ifstream arquivo("C:\\Users\\amara\\C++\\bancodedados.txt");
+    ifstream arquivo("C:\\Users\\amara\\Codigos_prog1\\BancoDeDados.txt");
 
     if (!arquivo.is_open()) 
     {  // Se o arquivo não existir, não faz nada
@@ -232,6 +406,8 @@ int main() {
         cout << "2. Listar todos" << endl;
         cout << "3. Salvar e sair" << endl;
         cout << "4. Remover filme" << endl;
+        cout << "5. Listar por intervalo" << endl;
+        cout << "6. Buscar filme" << endl;
         cout << "Escolha uma opção" << endl << "--> ";
         cin >> Opção_usuário;
 
@@ -254,15 +430,22 @@ int main() {
         case 3:
             SalvarArquivo(BancoDeDados, quantidade);
             cout << "Saindo.." << endl;
+            Continuar = false;
             break;  
         case 4:
             RemoverFilme(BancoDeDados, quantidade);
             break;
+        case 5:
+            ListarIntervalo(BancoDeDados, quantidade);
+            break;
+        case 6:
+            BuscarFilme(BancoDeDados, quantidade);
+            break;
+        default:
+            cout << "Opção inválida!" << endl;
+            break;
     }
 }
-    
-
-
     delete[] BancoDeDados;
     return 0;    
 }
