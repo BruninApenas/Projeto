@@ -458,8 +458,6 @@ int main() {
     delete[] BancoDeDados;
     return 0;    
 }
-    delete[] BancoDeDados;
-    return 0;    
-}
+
 
    
